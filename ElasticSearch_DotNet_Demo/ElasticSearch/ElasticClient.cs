@@ -27,6 +27,7 @@ namespace ElasticSearch_DotNet_Demo.ElasticSearch
 
 		internal async Task<List<Tweet>> SearchDocuments(string query, string indexName)
 		{
+			//multiple fields can be added to expand the search horizon
 			var response = await _client.SearchAsync<Tweet>(s => s
 								.Index(indexName)
 								.From(0)
