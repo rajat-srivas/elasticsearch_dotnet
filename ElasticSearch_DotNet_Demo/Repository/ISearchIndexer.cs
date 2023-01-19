@@ -7,5 +7,9 @@ namespace ElasticSearch_DotNet_Demo.Repository
 		Task<bool> IndexTweetsByUserName(string userName);
 
 		Task<List<Tweet>> SearchTweets(string query);
+
+		Task<bool> IndexProducts();
+
+		Task<List<Shoe>> FuzzySearchProducts(string query);
 	}
 }

@@ -19,7 +19,13 @@ namespace ElasticSearch_DotNet_Demo.ElasticSearch
 			_client = new ElasticsearchClient(elastic_cloudId, new ApiKey(elastic_apiKey));
 		}
 
-		public async Task<bool> IndexDocument(List<Tweet> documentToIndex, string indexName)
+		public async Task<bool> IndexTweets(List<Tweet> documentToIndex, string indexName)
+		{
+			var indexManyResponse = await _client.IndexManyAsync(documentToIndex, indexName);
+			return indexManyResponse.Errors;
+		}
+
+		public async Task<bool> IndexShoes(List<Shoe> documentToIndex, string indexName)
 		{
 			var indexManyResponse = await _client.IndexManyAsync(documentToIndex, indexName);
 			return indexManyResponse.Errors;
@@ -43,19 +49,47 @@ namespace ElasticSearch_DotNet_Demo.ElasticSearch
 								)
 								);
 
-		/*
-			 Fuzziness = >control the level of similarity required for a match. Here are a few examples:
-			 Auto: The "fuzziness" can be set to "AUTO" which calculates the fuzziness based on the length of the searched term. This is the default value.
-			 Edit Distance: The "fuzziness" can be set to a specific edit distance value, where 0 and 1 are considered to be exact matches. For example, a value of 2 allows for up to 2 single character edits (insertions, deletions, or substitutions) to be made to the searched term.
-             Proximity: The "fuzziness" can also be set as a value in the range of 0.0 to 1.0, where 0.0 requires an exact match and 1.0 allows for any match. This value is interpreted as a "proximity" value and represents the maximum allowed distance between terms.
-             FuzzyQuery: The "fuzziness" can be set to one of the predefined values (e.g. Fuzziness.Auto, Fuzziness.EditDistance(2) )
-		 */
+			/*
+				 Fuzziness = >control the level of similarity required for a match. Here are a few examples:
+				 Auto: The "fuzziness" can be set to "AUTO" which calculates the fuzziness based on the length of the searched term. This is the default value.
+				 Edit Distance: The "fuzziness" can be set to a specific edit distance value, where 0 and 1 are considered to be exact matches. For example, a value of 2 allows for up to 2 single character edits (insertions, deletions, or substitutions) to be made to the searched term.
+				 Proximity: The "fuzziness" can also be set as a value in the range of 0.0 to 1.0, where 0.0 requires an exact match and 1.0 allows for any match. This value is interpreted as a "proximity" value and represents the maximum allowed distance between terms.
+				 FuzzyQuery: The "fuzziness" can be set to one of the predefined values (e.g. Fuzziness.Auto, Fuzziness.EditDistance(2) )
+			 */
 
 			if (response.IsValidResponse)
 			{
-				var tweet = response.Documents.FirstOrDefault();
+				var tweet = response.Documents.ToList();
+				return tweet;
+			}
+			return null;
+		}
+
+		public async Task<List<Shoe>> SearchProducts(string query, string indexName)
+		{
+			var response = await _client.SearchAsync<Shoe>(s => s
+								.Index(indexName)
+								.From(0)
+								.Size(10)
+								.Query(q => q.Fuzzy(c => c.QueryName("named_query")
+								.Boost(2)
+								.Field(p => p.product_details)
+								.Field(p => p.brand)
+								.Field(p => p.title)
+								.Value(query)
+								.MaxExpansions(100)  
+								.PrefixLength(3)  
+								.Transpositions(false) 
+							)
+								)
+								);
+			if (response.IsValidResponse)
+			{
+				var shoes = response.Documents.ToList();
+				return shoes;
 			}
 			return null;
 		}
 	}
 }
+

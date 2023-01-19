@@ -15,6 +15,22 @@ namespace ElasticSearch_DotNet_Demo.Controllers
 		}
 
 		[HttpPost]
+		[Route("/products")]
+		public async Task<IActionResult> IndexProducts()
+		{
+			var response = await _indexer.IndexProducts();
+			return Ok(response);
+		}
+
+		[HttpPost]
+		[Route("/products/search")]
+		public async Task<IActionResult> FuzzySearchProducts(string query)
+		{
+			var response = await _indexer.FuzzySearchProducts(query);
+			return Ok(response);
+		}
+
+		[HttpPost]
 		[Route("/tweets/{userName}")]
 		public async Task<IActionResult> IndexTweetsByUser(string userName)
 		{

@@ -13,4 +13,8 @@
     <PackageReference Include="Elastic.Clients.Elasticsearch" Version="8.0.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Dataset\" />
+  </ItemGroup>
+
 </Project>
